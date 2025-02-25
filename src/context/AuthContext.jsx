@@ -11,53 +11,70 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (token) {
-      // В реальном проекте можно декодировать токен и сохранять данные пользователя
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error("Ошибка при загрузке пользователя из localStorage:", error);
+        setUser(null);
+        localStorage.removeItem('user');
       }
     }
   }, [token]);
 
   const login = async (email, password) => {
     try {
+      // Логин для админа (демо-режим)
+      if (email === 'admin' && password === 'admin') {
+        const userData = { id: 1, email: 'admin', username: 'Administrator' };
+        setUser(userData);
+        setToken('fake-admin-token');
+        localStorage.setItem('token', 'fake-admin-token');
+        localStorage.setItem('user', JSON.stringify(userData));
+        navigate('/profile');
+        return;
+      }
+  
       const data = await authService.login(email, password);
-      setToken(data.token);
-      localStorage.setItem('token', data.token);
-      // Пример: сохраняем минимальные данные пользователя
-      const userData = { email }; 
+      console.log("Ответ от сервера:", data); // <-- Лог для отладки!
+  
+      // Учёт того, что сервер возвращает "Token" с заглавной буквы
+      const returnedToken = data.Token || data.token;
+      if (!returnedToken) {
+        throw new Error("Некорректный ответ сервера");
+      }
+  
+      // Так как сервер не возвращает объект user, создаём его на основе email
+      const userData = { 
+        id: 0, 
+        email: email, 
+        username: email 
+      };
+  
+      setToken(returnedToken);
+      localStorage.setItem('token', returnedToken);
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
-      navigate('/');
+  
+      navigate('/profile');
     } catch (error) {
+      console.error("Ошибка при входе:", error);
       throw error;
     }
   };
-
-  const register = async (username, email, password) => {
-    try {
-      const data = await authService.register(username, email, password);
-      setToken(data.token);
-      localStorage.setItem('token', data.token);
-      const userData = { username, email };
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      navigate('/');
-    } catch (error) {
-      throw error;
-    }
-  };
-
+  
   const logout = () => {
     setToken(null);
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    navigate('/');
+    navigate('/login');
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

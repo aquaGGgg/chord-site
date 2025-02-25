@@ -9,6 +9,24 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Добавляем проверку для логина admin / admin
+    if (email === 'admin' && password === 'admin') {
+      try {
+        await login(email, password);
+        return; // Прерываем дальнейшее выполнение если это админ
+      } catch (err) {
+        setError(err.message || 'Ошибка при входе');
+        return;
+      }
+    }
+
+    // Стандартная валидация для email
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setError('Неверный формат электронной почты');
+      return;
+    }
+
     try {
       await login(email, password);
     } catch (err) {
@@ -22,7 +40,7 @@ const LoginPage = () => {
       {error && <div style={errorStyle}>{error}</div>}
       <form onSubmit={handleSubmit} style={formStyle}>
         <input 
-          type="email"
+          type="text" // Изменяем на type="text", чтобы можно было вводить admin
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}

@@ -7,16 +7,13 @@ const songsService = {
       const response = await api.get('/songs/authors');
       return response.data;
     } catch (error) {
-      // Если error.response не определён, выбрасываем error.message или сам error
       throw error.response?.data || error.message || error;
     }
   },
   // Получение песен по выбранному автору (фильтрация по строке)
   getSongsByAuthor: async (author) => {
     try {
-      // Получаем все песни
       const response = await api.get('/songs');
-      // Фильтруем песни по автору
       const allSongs = response.data;
       const filteredSongs = allSongs.filter(song => song.author === author);
       return filteredSongs;
@@ -28,6 +25,33 @@ const songsService = {
   getSong: async (songId) => {
     try {
       const response = await api.get(`/songs/${songId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message || error;
+    }
+  },
+  // Добавление песни в избранное для пользователя
+  addFavorite: async (userId, songId) => {
+    try {
+      const response = await api.post(`/users/${userId}/favorites`, { songId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message || error;
+    }
+  },
+  // Удаление песни из избранного для пользователя
+  removeFavorite: async (userId, songId) => {
+    try {
+      const response = await api.delete(`/users/${userId}/favorites/${songId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message || error;
+    }
+  },
+  // Получение избранных песен пользователя
+  getFavorites: async (userId) => {
+    try {
+      const response = await api.get(`/users/${userId}/favorites`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message || error;

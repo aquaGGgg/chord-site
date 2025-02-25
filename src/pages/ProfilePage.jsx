@@ -1,33 +1,39 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import api from '../services/api';
+import { useNavigate } from 'react-router-dom';
+import songsService from '../services/songsService';
 
 const ProfilePage = () => {
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const [likedSongs, setLikedSongs] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchLikedSongs = async () => {
-      if (user && user.id) {
+      if (user) {
         try {
-          // Предполагается, что API возвращает список лайкнутых песен по данному пользователю
-          const response = await api.get(`/users/${user.id}/favorites`);
-          setLikedSongs(response.data);
+          const favorites = await songsService.getFavorites(user.email);
+          setLikedSongs(favorites);
         } catch (error) {
           console.error("Ошибка при загрузке лайкнутых песен", error);
         }
       }
     };
     fetchLikedSongs();
-  }, [user]);
+  }, [user, likedSongs]); // Добавил likedSongs, чтобы обновлялось при изменении
+  
 
   const removeLike = async (songId) => {
     try {
-      await api.delete(`/users/${user.id}/favorites/${songId}`);
+      await songsService.removeFavorite(user.id, songId);
       setLikedSongs(likedSongs.filter(song => song.id !== songId));
     } catch (error) {
       console.error("Ошибка при удалении лайка", error);
     }
+  };
+
+  const handleAdminPanelClick = () => {
+    navigate('/admin');
   };
 
   return (
@@ -36,13 +42,20 @@ const ProfilePage = () => {
       {user ? (
         <>
           <p>Имя: {user.username || user.email}</p>
+          {user.email === 'admin' && (
+            <button onClick={handleAdminPanelClick} style={adminButtonStyle}>
+              Открыть админ-панель
+            </button>
+          )}
           <h3>Лайкнутые песни</h3>
           {likedSongs.length ? (
             <ul style={listStyle}>
               {likedSongs.map(song => (
                 <li key={song.id} style={itemStyle}>
                   {song.title}
-                  <button onClick={() => removeLike(song.id)} style={removeButtonStyle}>Убрать лайк</button>
+                  <button onClick={() => removeLike(song.id)} style={removeButtonStyle}>
+                    Убрать лайк
+                  </button>
                 </li>
               ))}
             </ul>
@@ -53,6 +66,7 @@ const ProfilePage = () => {
       ) : (
         <p>Пользователь не авторизован.</p>
       )}
+      <button onClick={logout} style={logoutButtonStyle}>Выйти</button>
     </div>
   );
 };
@@ -81,6 +95,26 @@ const removeButtonStyle = {
   color: '#fff',
   border: 'none',
   borderRadius: '4px',
+  cursor: 'pointer'
+};
+
+const adminButtonStyle = {
+  marginBottom: '20px',
+  padding: '10px',
+  borderRadius: '4px',
+  backgroundColor: '#28a745',
+  color: '#fff',
+  border: 'none',
+  cursor: 'pointer'
+};
+
+const logoutButtonStyle = {
+  marginTop: '20px',
+  padding: '10px',
+  borderRadius: '4px',
+  backgroundColor: '#d9534f',
+  color: '#fff',
+  border: 'none',
   cursor: 'pointer'
 };
 

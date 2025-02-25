@@ -6,7 +6,12 @@ const authService = {
       const response = await api.post('/auth/login', { email, password });
       return response.data;
     } catch (error) {
-      throw error.response.data;
+      // Проверяем наличие error.response и error.response.data
+      if (error.response && error.response.data) {
+        throw error.response.data;
+      } else {
+        throw { message: "Ошибка при подключении к серверу" };
+      }
     }
   },
   register: async (username, email, password) => {
@@ -14,7 +19,11 @@ const authService = {
       const response = await api.post('/auth/register', { userName: username, email, password });
       return response.data;
     } catch (error) {
-      throw error.response.data;
+      if (error.response && error.response.data) {
+        throw error.response.data;
+      } else {
+        throw { message: "Ошибка при подключении к серверу" };
+      }
     }
   },
 };
