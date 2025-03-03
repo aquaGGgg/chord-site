@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/chord-site/static/css/main.f7647be6.css",
+    "main.js": "/chord-site/static/js/main.f200bdce.js",
+    "index.html": "/chord-site/index.html",
+    "main.f7647be6.css.map": "/chord-site/static/css/main.f7647be6.css.map",
+    "main.f200bdce.js.map": "/chord-site/static/js/main.f200bdce.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f7647be6.css",
+    "static/js/main.f200bdce.js"
+  ]
+}
