@@ -6,7 +6,6 @@ const AdminPage = () => {
   const [newSong, setNewSong] = useState({ title: '', author: '', lyricsWithChords: '' });
   const [editingSong, setEditingSong] = useState(null);
 
-  // Загружаем песни при открытии страницы
   useEffect(() => {
     fetchSongs();
   }, []);
@@ -22,7 +21,12 @@ const AdminPage = () => {
 
   const createSong = async () => {
     try {
-      const response = await api.post('/songs', newSong);
+      const cleanedSong = {
+        title: newSong.title.trim(),
+        author: newSong.author.trim(),
+        lyricsWithChords: newSong.lyricsWithChords.trim(),
+      };
+      const response = await api.post('/songs', cleanedSong);
       setSongs([...songs, response.data]);
       setNewSong({ title: '', author: '', lyricsWithChords: '' });
     } catch (error) {
@@ -32,7 +36,13 @@ const AdminPage = () => {
 
   const updateSong = async () => {
     try {
-      const response = await api.put(`/songs/${editingSong.id}`, editingSong);
+      const cleanedSong = {
+        ...editingSong,
+        title: editingSong.title.trim(),
+        author: editingSong.author.trim(),
+        lyricsWithChords: editingSong.lyricsWithChords.trim(),
+      };
+      const response = await api.put(`/songs/${editingSong.id}`, cleanedSong);
       setSongs(songs.map(song => (song.id === editingSong.id ? response.data : song)));
       setEditingSong(null);
     } catch (error) {
@@ -59,35 +69,57 @@ const AdminPage = () => {
           type="text"
           placeholder="Автор"
           value={editingSong ? editingSong.author : newSong.author}
-          onChange={(e) => editingSong ? setEditingSong({ ...editingSong, author: e.target.value }) : setNewSong({ ...newSong, author: e.target.value })}
+          onChange={(e) =>
+            editingSong
+              ? setEditingSong({ ...editingSong, author: e.target.value.trimStart() })
+              : setNewSong({ ...newSong, author: e.target.value.trimStart() })
+          }
           style={inputStyle}
         />
         <input
           type="text"
           placeholder="Название"
           value={editingSong ? editingSong.title : newSong.title}
-          onChange={(e) => editingSong ? setEditingSong({ ...editingSong, title: e.target.value }) : setNewSong({ ...newSong, title: e.target.value })}
+          onChange={(e) =>
+            editingSong
+              ? setEditingSong({ ...editingSong, title: e.target.value.trimStart() })
+              : setNewSong({ ...newSong, title: e.target.value.trimStart() })
+          }
           style={inputStyle}
         />
         <textarea
           placeholder="Текст с аккордами"
           value={editingSong ? editingSong.lyricsWithChords : newSong.lyricsWithChords}
-          onChange={(e) => editingSong ? setEditingSong({ ...editingSong, lyricsWithChords: e.target.value }) : setNewSong({ ...newSong, lyricsWithChords: e.target.value })}
+          onChange={(e) =>
+            editingSong
+              ? setEditingSong({ ...editingSong, lyricsWithChords: e.target.value })
+              : setNewSong({ ...newSong, lyricsWithChords: e.target.value })
+          }
           style={textareaStyle}
         />
         <button onClick={editingSong ? updateSong : createSong} style={buttonStyle}>
           {editingSong ? 'Обновить песню' : 'Добавить песню'}
         </button>
-        {editingSong && <button onClick={() => setEditingSong(null)} style={cancelButtonStyle}>Отменить редактирование</button>}
+        {editingSong && (
+          <button onClick={() => setEditingSong(null)} style={cancelButtonStyle}>
+            Отменить редактирование
+          </button>
+        )}
       </div>
 
       <h3>Список песен</h3>
       <ul style={listStyle}>
-        {songs.map(song => (
+        {songs.map((song) => (
           <li key={song.id} style={listItemStyle}>
-            <p><strong>{song.title}</strong> - {song.author}</p>
-            <button onClick={() => setEditingSong(song)} style={editButtonStyle}>Редактировать</button>
-            <button onClick={() => deleteSong(song.id)} style={deleteButtonStyle}>Удалить</button>
+            <p>
+              <strong>{song.title}</strong> - {song.author}
+            </p>
+            <button onClick={() => setEditingSong(song)} style={editButtonStyle}>
+              Редактировать
+            </button>
+            <button onClick={() => deleteSong(song.id)} style={deleteButtonStyle}>
+              Удалить
+            </button>
           </li>
         ))}
       </ul>

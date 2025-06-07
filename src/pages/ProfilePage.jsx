@@ -20,8 +20,7 @@ const ProfilePage = () => {
       }
     };
     fetchLikedSongs();
-  }, [user, likedSongs]); // Добавил likedSongs, чтобы обновлялось при изменении
-  
+  }, [user]);
 
   const removeLike = async (songId) => {
     try {
@@ -42,7 +41,7 @@ const ProfilePage = () => {
       {user ? (
         <>
           <p>Имя: {user.username || user.email}</p>
-          {user.email === 'admin' && (
+          {(user.role?.toLowerCase() === 'admin') && (
             <button onClick={handleAdminPanelClick} style={adminButtonStyle}>
               Открыть админ-панель
             </button>
