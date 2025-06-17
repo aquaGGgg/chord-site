@@ -2,7 +2,7 @@ import axios from 'axios';
 import authService from './authService';
 
 const api = axios.create({
-  baseURL: 'https://localhost:55184/api',
+  baseURL: 'https://a34433-cd5b.k.d-f.pw/api',
 });
 
 // Добавляем access token
