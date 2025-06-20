@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import AuthorsList from '../components/AuthorsList';
 import SongsList from '../components/SongsList';
 import SongDetails from '../components/SongDetails';
-import Chat from '../components/Chat';
 
 const HomePage = () => {
   const [selectedAuthor, setSelectedAuthor] = useState(null);
@@ -32,11 +31,6 @@ const HomePage = () => {
       {/* Правая колонка: детали песни */}
       <div style={detailsColumnStyle}>
         <SongDetails songId={selectedSong ? selectedSong.id : null} />
-      </div>
-
-      {/* Чат */}
-      <div style={chatColumnStyle}>
-        <Chat />
       </div>
     </div>
   );
@@ -69,15 +63,6 @@ const detailsColumnStyle = {
   justifyContent: 'center',
   alignItems: 'flex-start',
   padding: '1rem',
-  overflowY: 'auto',
-};
-
-const chatColumnStyle = {
-  width: '300px',
-  minWidth: '300px',
-  borderLeft: '1px solid #444',
-  padding: '1rem',
-  background: '#252525',
   overflowY: 'auto',
 };
 
