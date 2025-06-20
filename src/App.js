@@ -5,10 +5,9 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
-import ChatPage from './pages/ChatPage';
 import Header from './components/Header';
 import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute'; // ✅ импорт
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -28,7 +27,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/chat" element={<ChatPage />} />
         </Routes>
       </AuthProvider>
     </Router>
